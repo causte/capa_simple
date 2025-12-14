@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="action_capa_record" model="ir.actions.act_window">
+    <field name="name">CAPA Records</field>
+    <field name="res_model">capa.record</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_past_due_capa" model="ir.actions.act_window">
+    <field name="name">Past Due CAPAs</field>
+    <field name="res_model">capa.record</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="domain">[('state','=','open'),('due_date','&lt;', context_today())]</field>
+  </record>
+
+  <menuitem id="menu_capa_root" name="CAPA" sequence="10"/>
+  <menuitem id="menu_capa_records" name="CAPA Records" parent="menu_capa_root" action="action_capa_record" sequence="10"/>
+  <menuitem id="menu_capa_past_due" name="Past Due" parent="menu_capa_root" action="action_past_due_capa" sequence="20"/>
+
+  <record id="view_capa_list" model="ir.ui.view">
+    <field name="name">capa.record.list</field>
+    <field name="model">capa.record</field>
+    <field name="arch" type="xml">
+      <list string="CAPA Records">
+        <field name="due_dot" widget="badge" readonly="1"/>
+        <field name="name"/>
+        <field name="date_open"/>
+        <field name="due_date"/>
+        <field name="responsible_id"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_capa_search" model="ir.ui.view">
+    <field name="name">capa.record.search</field>
+    <field name="model">capa.record</field>
+    <field name="arch" type="xml">
+      <search string="CAPA Records">
+        <filter name="filter_past_due" string="Past Due" domain="[('state','=','open'),('due_date','&lt;',context_today())]"/>
+        <separator/>
+        <filter name="filter_open" string="Open" domain="[('state','=','open')]"/>
+        <filter name="filter_closed" string="Closed" domain="[('state','=','closed')]"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_capa_kanban" model="ir.ui.view">
+    <field name="name">capa.record.kanban</field>
+    <field name="model">capa.record</field>
+    <field name="arch" type="xml">
+      <kanban>
+        <field name="name"/>
+        <field name="due_date"/>
+        <field name="responsible_id"/>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_card oe_kanban_global_click bg-light" role="button">
+              <div class="o_kanban_primary_center">
+                <strong><field name="name"/></strong>
+              </div>
+              <div class="o_kanban_bottom">
+                <div><span>Due:</span> <field name="due_date"/></div>
+                <div><field name="responsible_id"/></div>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <record id="view_capa_form" model="ir.ui.view">
+    <field name="name">capa.record.form</field>
+    <field name="model">capa.record</field>
+    <field name="arch" type="xml">
+      <form string="CAPA Record">
+        <header>
+          <field name="state" widget="statusbar" statusbar_visible="open,closed"/>
+          <button name="action_mark_closed" type="object" string="Mark Closed" class="oe_highlight"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="name"/>
+          </group>
+          <group>
+            <field name="date_open"/>
+            <field name="due_date"/>
+            <field name="responsible_id"/>
+          </group>
+          <group>
+            <field name="description"/>
+          </group>
+          <group>
+            <field name="investigation"/>
+          </group>
+          <group>
+            <field name="resolution"/>
+          </group>
+        </sheet>
+        <div class="oe_chatter">
+          <field name="message_follower_ids" widget="mail_followers"/>
+          <field name="message_ids" widget="mail_thread"/>
+          <field name="activity_ids" widget="mail_activity"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+</odoo>
